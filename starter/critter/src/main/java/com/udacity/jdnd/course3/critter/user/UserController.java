@@ -1,10 +1,15 @@
 package com.udacity.jdnd.course3.critter.user;
 
+import com.udacity.jdnd.course3.critter.dao.CustomerDao;
+import com.udacity.jdnd.course3.critter.data.Customer;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Handles web requests related to Users.
@@ -16,14 +21,20 @@ import java.util.Set;
 @RequestMapping("/user")
 public class UserController {
 
+    @Autowired
+    CustomerDao customerDao;
+
     @PostMapping("/customer")
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
-        throw new UnsupportedOperationException();
+        Customer customer = convertCustomerDTOToEntity(customerDTO);
+        customerDao.addCustomer(customer);
+        return customerDTO;
     }
 
     @GetMapping("/customer")
     public List<CustomerDTO> getAllCustomers(){
-        throw new UnsupportedOperationException();
+        List<Customer> customers = customerDao.list();
+        return customers.stream().map(this::convertEntityToCustomerDTO).collect(Collectors.toList());
     }
 
     @GetMapping("/customer/pet/{petId}")
@@ -51,4 +62,15 @@ public class UserController {
         throw new UnsupportedOperationException();
     }
 
+    private Customer convertCustomerDTOToEntity(CustomerDTO customerDTO) {
+        Customer customer = new Customer();
+        BeanUtils.copyProperties(customerDTO, customer);
+        return customer;
+    }
+
+    private CustomerDTO convertEntityToCustomerDTO(Customer customer) {
+        CustomerDTO customerDTO = new CustomerDTO();
+        BeanUtils.copyProperties(customer, customerDTO);
+        return customerDTO;
+    }
 }
