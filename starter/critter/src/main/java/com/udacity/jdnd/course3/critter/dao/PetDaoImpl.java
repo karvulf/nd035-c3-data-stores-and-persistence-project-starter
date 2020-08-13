@@ -1,18 +1,21 @@
-package com.udacity.jdnd.course3.critter.pet;
+package com.udacity.jdnd.course3.critter.dao;
 
-import com.udacity.jdnd.course3.critter.user.Customer;
+import com.udacity.jdnd.course3.critter.entity.Pet;
+import com.udacity.jdnd.course3.critter.pet.PetType;
+import com.udacity.jdnd.course3.critter.entity.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -21,6 +24,9 @@ public class PetDaoImpl implements PetDao {
 
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Autowired
+    CustomerDao customerDao;
 
     private static final String BIRTH_DATE = "birthDate";
     private static final String NAME = "name";
@@ -67,7 +73,7 @@ public class PetDaoImpl implements PetDao {
 
     @Override
     public List<Pet> list() {
-        return jdbcTemplate.query(SELECT_ALL_PET, petRowMapper);
+        return jdbcTemplate.query(SELECT_ALL_PET, (rs, rowNum) -> getPetByRS(rs));
     }
 
     @Override
@@ -75,7 +81,8 @@ public class PetDaoImpl implements PetDao {
         return jdbcTemplate.queryForObject(
                 SELECT_PET_BY_ID,
                 new MapSqlParameterSource().addValue("id", id),
-                new BeanPropertyRowMapper<>(Pet.class));
+                (rs, rowNum) -> getPetByRS(rs)
+        );
     }
 
     @Override
@@ -83,6 +90,28 @@ public class PetDaoImpl implements PetDao {
         return jdbcTemplate.query(
                 SELECT_PET_BY_OWNER_ID,
                 new MapSqlParameterSource().addValue("id", id),
-                petRowMapper);
+                (rs, rowNum) -> getPetByRS(rs));
+    }
+
+    private Customer getCustomerById(Long id) {
+        if(id != null){
+            return customerDao.getCustomerById(id);
+        }
+        return null;
+    }
+
+    private Pet getPetByRS(ResultSet rs) throws SQLException {
+        LocalDate localDate = null;
+        if(rs.getTimestamp("birth_date") != null) {
+            localDate = rs.getTimestamp("birth_date").toLocalDateTime().toLocalDate();
+        }
+        return new Pet(
+            rs.getLong("id"),
+            PetType.valueOf(rs.getString("type")),
+            rs.getString("name"),
+            localDate,
+            rs.getString("notes"),
+            getCustomerById(rs.getLong("owner_id"))
+        );
     }
 }

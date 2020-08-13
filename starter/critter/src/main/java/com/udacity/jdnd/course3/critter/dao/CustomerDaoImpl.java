@@ -1,6 +1,6 @@
-package com.udacity.jdnd.course3.critter.user;
+package com.udacity.jdnd.course3.critter.dao;
 
-import com.udacity.jdnd.course3.critter.pet.Pet;
+import com.udacity.jdnd.course3.critter.entity.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,6 +11,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -36,15 +38,19 @@ public class CustomerDaoImpl implements CustomerDao {
 
     @Override
     public List<Customer> list() {
-        return jdbcTemplate.query(SELECT_ALL_CUSTOMER, customerRowMapper);
+        return jdbcTemplate.query(
+                SELECT_ALL_CUSTOMER,
+                ((rs, rowNum) -> getCustomerFromRS(rs))
+        );
     }
 
     @Override
     public Customer getOwnerByPet(Long petId) {
-        return jdbcTemplate.queryForObject(
+        Customer customer = jdbcTemplate.queryForObject(
                 SELECT_OWNER_BY_PET_ID,
                 new MapSqlParameterSource().addValue("id", petId),
                 new BeanPropertyRowMapper<>(Customer.class));
+        return customer;
     }
 
     @Override
@@ -58,9 +64,20 @@ public class CustomerDaoImpl implements CustomerDao {
 
     @Override
     public Customer getCustomerById(Long id) {
-        return jdbcTemplate.queryForObject(
+        Customer customer = jdbcTemplate.queryForObject(
                 SELECT_CUSTOMER_BY_ID,
                 new MapSqlParameterSource().addValue("id", id),
                 new BeanPropertyRowMapper<>(Customer.class));
+        return customer;
+    }
+
+    private Customer getCustomerFromRS(ResultSet rs) throws SQLException {
+        Customer customer = new Customer(
+                rs.getLong("id"),
+                rs.getString("name"),
+                rs.getString("phone_number"),
+                rs.getString("notes")
+        );
+        return customer;
     }
 }
