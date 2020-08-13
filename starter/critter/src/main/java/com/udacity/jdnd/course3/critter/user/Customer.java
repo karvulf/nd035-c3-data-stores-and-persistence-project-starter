@@ -1,4 +1,6 @@
-package com.udacity.jdnd.course3.critter.data;
+package com.udacity.jdnd.course3.critter.user;
+
+import com.udacity.jdnd.course3.critter.pet.Pet;
 
 import javax.persistence.*;
 import java.util.List;
@@ -7,14 +9,14 @@ import java.util.List;
 public class Customer {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
     private String phoneNumber;
     private String notes;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Pet> pets;
 
     public Long getId() {
