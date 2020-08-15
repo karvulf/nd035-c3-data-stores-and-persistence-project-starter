@@ -64,11 +64,14 @@ public class CustomerDaoImpl implements CustomerDao {
 
     @Override
     public Customer getCustomerById(Long id) {
-        Customer customer = jdbcTemplate.queryForObject(
-                SELECT_CUSTOMER_BY_ID,
-                new MapSqlParameterSource().addValue("id", id),
-                new BeanPropertyRowMapper<>(Customer.class));
-        return customer;
+        try {
+            return jdbcTemplate.queryForObject(
+                    SELECT_CUSTOMER_BY_ID,
+                    new MapSqlParameterSource().addValue("id", id),
+                    new BeanPropertyRowMapper<>(Customer.class));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private Customer getCustomerFromRS(ResultSet rs) throws SQLException {

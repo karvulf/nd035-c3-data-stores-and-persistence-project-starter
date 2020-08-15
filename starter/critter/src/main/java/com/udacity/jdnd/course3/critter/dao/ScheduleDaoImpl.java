@@ -150,6 +150,11 @@ public class ScheduleDaoImpl implements ScheduleDao {
         return schedule;
     }
 
+    /**
+     * return a list of pets that are related to the scheduleId
+     * @param scheduleId
+     * @return
+     */
     private List<Pet> getPets(Long scheduleId) {
         List<Long> petIds = getIds(scheduleId, SELECT_SCHEDULE_PETS_BY_ID, "pets_id");
         List<Pet> pets = new ArrayList<>();
@@ -159,6 +164,11 @@ public class ScheduleDaoImpl implements ScheduleDao {
         return pets;
     }
 
+    /**
+     * returns a list of employees that are related to the scheduleId
+     * @param scheduleId
+     * @return
+     */
     private List<Employee> getEmployees(Long scheduleId) {
         List<Long> employeeIds = getIds(scheduleId, SELECT_SCHEDULE_EMPLOYEES_BY_ID,"employees_id");
         List<Employee> employees = new ArrayList<>();
@@ -168,6 +178,13 @@ public class ScheduleDaoImpl implements ScheduleDao {
         return employees;
     }
 
+    /**
+     * generic method to return ids of a specific column with a defined query
+     * @param idValue id of row that is searched
+     * @param query to find the ids
+     * @param columnName name of the column to return the ids
+     * @return
+     */
     private List<Long> getIds(Long idValue, String query, String columnName) {
         return jdbcTemplate.query(
                 query,
@@ -186,6 +203,11 @@ public class ScheduleDaoImpl implements ScheduleDao {
         );
     }
 
+    /**
+     * returns a Set of activities that are related to the scheduleId from the table schedule_activities
+     * @param scheduleId
+     * @return
+     */
     private Set<EmployeeSkill> getActivities(Long scheduleId) {
         return jdbcTemplate.query(
                 SELECT_SCHEDULE_ACTIVITIES_BY_ID,
@@ -202,6 +224,11 @@ public class ScheduleDaoImpl implements ScheduleDao {
         );
     }
 
+    /**
+     * adds all employees of schedule to table schedule_employees
+     * @param scheduleId
+     * @param employees
+     */
     private void addEmployees(Long scheduleId, List<Employee> employees) {
         if (employees != null) {
             for (Employee employee : employees) {
@@ -214,6 +241,11 @@ public class ScheduleDaoImpl implements ScheduleDao {
         }
     }
 
+    /**
+     * adds all pets of schedule to table schedule_pets
+     * @param scheduleId
+     * @param pets
+     */
     private void addPets(Long scheduleId, List<Pet> pets) {
         if (pets != null) {
             for (Pet pet : pets) {
@@ -226,6 +258,11 @@ public class ScheduleDaoImpl implements ScheduleDao {
         }
     }
 
+    /**
+     * add all activites of schedule to table schedule_activities
+     * @param scheduleId
+     * @param skills
+     */
     private void addActivities(Long scheduleId, Set<EmployeeSkill> skills) {
         if (skills != null) {
             for (EmployeeSkill skill : skills) {

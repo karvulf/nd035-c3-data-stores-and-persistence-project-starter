@@ -30,10 +30,10 @@ public class EmployeeDaoImpl implements EmployeeDao {
     private static final String FILTERED_SKILL_TABLE = "FILTERED_SKILL_TABLE";
 
     private static final String DELETE_EMPLOYEE_SKILLS =
-            "DELETE employee_skills WHERE employee_id = :" + EMPLOYEE_ID;
+            "DELETE FROM employee_skills WHERE employee_id = :" + EMPLOYEE_ID;
 
     private static final String DELETE_EMPLOYEE_DAYS_AVAILABLE =
-            "DELETE employee_days_available WHERE employee_id = :" + EMPLOYEE_ID;
+            "DELETE FROM employee_days_available WHERE employee_id = :" + EMPLOYEE_ID;
 
     private static final String SELECT_EMPLOYEE_BY_ID =
             "SELECT * FROM employee " +

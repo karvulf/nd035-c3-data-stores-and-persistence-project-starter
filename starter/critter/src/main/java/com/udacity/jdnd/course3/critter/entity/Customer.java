@@ -1,7 +1,5 @@
 package com.udacity.jdnd.course3.critter.entity;
 
-import com.udacity.jdnd.course3.critter.entity.Pet;
-
 import javax.persistence.*;
 import java.util.List;
 
